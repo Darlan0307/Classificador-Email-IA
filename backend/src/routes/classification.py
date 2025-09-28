@@ -19,7 +19,7 @@ def get_email_processor():
     return EmailProcessor()
 
 def get_ai_classifier():
-    from backend.src.main import ai_classifier
+    from src.main import ai_classifier
     return ai_classifier
 
 def get_file_handler():

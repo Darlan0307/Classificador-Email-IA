@@ -4,9 +4,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 import logging
 
-from services.email_processor import EmailProcessor
-from services.ai_classifier import AIClassifier
-from utils.file_handler import FileHandler
+from services.registry import ai_classifier
 from config.settings import get_settings
 
 from routes import classification, health
@@ -15,9 +13,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 settings = get_settings()
-email_processor = EmailProcessor()
-ai_classifier = AIClassifier()
-file_handler = FileHandler()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

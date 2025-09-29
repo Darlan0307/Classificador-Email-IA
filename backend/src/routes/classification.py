@@ -2,11 +2,11 @@ from fastapi import APIRouter, File, UploadFile, Form, HTTPException, Depends
 from typing import Optional
 from datetime import datetime
 import logging
-
 from services.email_processor import EmailProcessor
 from services.ai_classifier import AIClassifier
+from services.file_handler import FileHandler
+from services.registry import email_processor, ai_classifier, file_handler
 from models.email_models import EmailClassificationResponse
-from utils.file_handler import FileHandler
 
 logger = logging.getLogger(__name__)
 
@@ -16,14 +16,13 @@ router = APIRouter(
 )
 
 def get_email_processor():
-    return EmailProcessor()
+    return email_processor
 
 def get_ai_classifier():
-    from src.main import ai_classifier
     return ai_classifier
 
 def get_file_handler():
-    return FileHandler()
+    return file_handler
 
 @router.post("/classify-email", response_model=EmailClassificationResponse)
 async def classify_email_text(

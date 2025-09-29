@@ -6,6 +6,8 @@ from typing import Dict, Any
 import httpx
 from config.settings import get_settings
 from services.email_processor import EmailProcessor
+from utils.prompt_utils import build_classification_prompt, build_response_prompt, truncate_prompt
+
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +19,6 @@ class AIClassifier:
         
     async def initialize(self):
         self.client = httpx.AsyncClient(timeout=30.0)
-        logger.info(f"AI Classifier inicializado com OpenAI GPT-3.5-turbo")
         
     async def classify_email(self, email_data: Dict[str, Any]) -> Dict[str, Any]:
         start_time = time.time()
@@ -27,7 +28,7 @@ class AIClassifier:
                 email_data.get('original_content', '')
             )
             
-            classification_prompt = self._build_classification_prompt(
+            classification_prompt = build_classification_prompt(
                 email_data, analysis
             )
             
@@ -52,69 +53,26 @@ class AIClassifier:
             logger.error(f"Erro na classificação: {str(e)}")
             return await self._fallback_classification(email_data)
     
-    def _build_classification_prompt(self, email_data: Dict[str, Any], analysis: Dict[str, Any]) -> str:
-        content = email_data.get('original_content', '')
-        sender = email_data.get('sender_name', 'Desconhecido')
-        subject = email_data.get('subject', 'Sem assunto')
-        
-        prompt = f"""
-Você é um assistente especializado em classificar emails corporativos do setor financeiro.
-
-CONTEXTO:
-- Remetente: {sender}
-- Assunto: {subject}
-- Conteúdo do email: "{content}"
-
-ANÁLISE TÉCNICA:
-- Palavras-chave: {', '.join(analysis.get('keywords', []))}
-- Indicadores de urgência: {', '.join(analysis.get('urgency_indicators', []))}
-- Indicadores de saudação: {', '.join(analysis.get('greeting_indicators', []))}
-- Indicadores de solicitação: {', '.join(analysis.get('request_indicators', []))}
-- Contém perguntas: {"Sim" if analysis.get('has_question_marks') else "Não"}
-
-CATEGORIAS:
-1. PRODUTIVO: Emails que requerem ação específica, resposta ou acompanhamento
-   - Solicitações de suporte técnico
-   - Dúvidas sobre sistemas ou processos
-   - Pedidos de informação ou status
-   - Relatórios de problemas
-   - Questões operacionais
-
-2. IMPRODUTIVO: Emails que não necessitam ação imediata
-   - Mensagens de felicitação
-   - Agradecimentos gerais
-   - Mensagens sociais ou pessoais
-   - Informações apenas para conhecimento
-   - Comunicados gerais
-
-INSTRUÇÕES:
-1. Analise cuidadosamente o conteúdo
-2. Considere o contexto corporativo financeiro
-3. Responda APENAS com um JSON no formato:
-{{"categoria": "produtivo|improdutivo", "confianca": 0.0-1.0, "justificativa": "explicação breve"}}
-
-Sua resposta:"""
-        
-        return prompt
-    
     async def _call_openai_classification(self, prompt: str) -> Dict[str, Any]:
         headers = {
             "Authorization": f"Bearer {self.settings.OPENAI_API_KEY}",
             "Content-Type": "application/json"
         }
+
+        promptTruncated = truncate_prompt(prompt)
         
         payload = {
-            "model": "gpt-3.5-turbo",
+            "model": f"{self.settings.OPENAI_MODEL}",
             "messages": [
                 {"role": "system", "content": "Você é um especialista em classificação de emails corporativos. Responda sempre no formato JSON solicitado."},
-                {"role": "user", "content": prompt}
+                {"role": "user", "content": promptTruncated}
             ],
             "temperature": 0.3,
             "max_tokens": 200
         }
         
         response = await self.client.post(
-            "https://api.openai.com/v1/chat/completions",
+            f"{self.settings.OPENAI_BASE_URL}/chat/completions",
             headers=headers,
             json=payload
         )
@@ -173,75 +131,36 @@ Sua resposta:"""
             sender = email_data.get('sender_name', 'Prezado(a)')
             subject = email_data.get('subject', '')
             
-            response_prompt = self._build_response_prompt(content, sender, subject, category)
+            response_prompt = build_response_prompt(content, sender, subject, category)
             
             openai_response = await self._call_openai_response(response_prompt)
-            
             return self._process_response_generation(openai_response, category, sender)
             
         except Exception as e:
             logger.error(f"Erro na geração de resposta: {str(e)}")
             return self._get_fallback_response(category, sender)
-    
-    def _build_response_prompt(self, content: str, sender: str, subject: str, category: str) -> str:
-        if category == 'produtivo':
-            prompt = f"""
-Você é um assistente de atendimento de uma empresa do setor financeiro. 
-Gere uma resposta profissional e personalizada para este email PRODUTIVO.
 
-EMAIL RECEBIDO:
-- Remetente: {sender}
-- Assunto: {subject}
-- Conteúdo: "{content}"
-
-DIRETRIZES PARA RESPOSTA PRODUTIVA:
-- Seja profissional e empático
-- Reconheça a solicitação específica
-- Forneça próximos passos claros
-- Inclua prazo estimado quando apropriado
-- Use tom colaborativo e solutivo
-- Máximo 150 palavras
-
-Resposta:"""
-        else:
-            prompt = f"""
-Você é um assistente de atendimento de uma empresa do setor financeiro.
-Gere uma resposta educada e cordial para este email IMPRODUTIVO.
-
-EMAIL RECEBIDO:
-- Remetente: {sender}
-- Assunto: {subject}
-- Conteúdo: "{content}"
-
-DIRETRIZES PARA RESPOSTA IMPRODUTIVA:
-- Seja cordial e agradecido
-- Reconheça a mensagem positivamente
-- Mantenha tom caloroso mas profissional
-- Seja breve mas não frio
-- Máximo 80 palavras
-
-Resposta:"""
-        
-        return prompt
     
     async def _call_openai_response(self, prompt: str) -> Dict[str, Any]:
         headers = {
             "Authorization": f"Bearer {self.settings.OPENAI_API_KEY}",
             "Content-Type": "application/json"
         }
+
+        promptTruncated = truncate_prompt(prompt)
         
         payload = {
-            "model": "gpt-3.5-turbo",
+            "model": f"{self.settings.OPENAI_MODEL}",
             "messages": [
                 {"role": "system", "content": "Você é um assistente profissional de atendimento ao cliente do setor financeiro. Seja sempre cordial, claro e útil."},
-                {"role": "user", "content": prompt}
+                {"role": "user", "content": promptTruncated}
             ],
             "temperature": 0.7,
             "max_tokens": 300
         }
         
         response = await self.client.post(
-            "https://api.openai.com/v1/chat/completions",
+            f"{self.settings.OPENAI_BASE_URL}/chat/completions",
             headers=headers,
             json=payload
         )

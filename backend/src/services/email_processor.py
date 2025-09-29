@@ -21,7 +21,6 @@ class EmailProcessor:
             ('tokenizers/punkt', 'punkt'),
             ('corpora/stopwords', 'stopwords'), 
             ('stemmers/rslp', 'rslp'),
-            ('vader_lexicon', 'vader_lexicon')
         ]
         
         for path, resource in nltk_resources:

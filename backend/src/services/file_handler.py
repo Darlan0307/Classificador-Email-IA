@@ -11,7 +11,7 @@ class FileHandler:
     
     def __init__(self):
         self.supported_extensions = {'.txt', '.pdf'}
-        self.max_file_size = 10 * 1024 * 1024
+        self.max_file_size = 50 * 1024 * 1024
     
     def is_valid_file_type(self, filename: Optional[str]) -> bool:
         if not filename:
@@ -31,7 +31,7 @@ class FileHandler:
         if len(file_content) > self.max_file_size:
             raise HTTPException(
                 status_code=400, 
-                detail="Arquivo muito grande. Máximo permitido: 10MB"
+                detail="Arquivo muito grande. Máximo permitido: 50MB"
             )
         
         file_extension = os.path.splitext(file.filename)[1].lower()

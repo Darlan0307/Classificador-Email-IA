@@ -9,7 +9,9 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = Field(default="info", description="Nível de log")
     FRONTEND_URL: str = Field(default="http://localhost:8080", description="URL do frontend para CORS")
     
+    OPENAI_BASE_URL: str = Field(default="https://api.openai.com/v1", description="URL base da API OpenAI")
     OPENAI_API_KEY: str = Field(..., description="Chave da API OpenAI")
+    OPENAI_MODEL: str = Field(default="gpt-3.5-turbo", description="Modelo da API OpenAI")
 
     class Config:
         env_file = ".env"
@@ -26,7 +28,9 @@ def get_settings() -> Settings:
 
 def create_example_env_file():
     env_example = """# Configurações da API OpenAI
+OPENAI_BASE_URL=https://api.openai.com/v1
 OPENAI_API_KEY=sua_chave_openai_aqui
+OPENAI_MODEL=gpt-3.5-turbo
 
 # Configurações do servidor
 HOST=0.0.0.0

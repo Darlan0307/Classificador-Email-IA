@@ -92,7 +92,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
           </CardHeader>
           <CardContent>
             <div className="bg-muted p-3 rounded-md">
-              <p className="text-sm leading-relaxed">
+              <p className="text-sm leading-relaxed max-h-[350px] overflow-auto">
                 {result.suggested_response}
               </p>
             </div>

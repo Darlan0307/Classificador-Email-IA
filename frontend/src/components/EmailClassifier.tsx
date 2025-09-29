@@ -49,7 +49,7 @@ const EmailClassifier = () => {
       <header className="bg-gradient-subtle">
         <div className="container mx-auto px-4 pt-10">
           <div className="text-center">
-            <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
               <div className="p-3 rounded-lg bg-gradient-primary text-primary-foreground">
                 <Mail className="h-8 w-8" />
               </div>

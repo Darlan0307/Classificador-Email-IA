@@ -12,6 +12,7 @@ interface FileFormProps {
 }
 
 const FileForm: React.FC<FileFormProps> = ({ onSubmit, isLoading }) => {
+  const MAX_FILE_SIZE = 50 * 1024 * 1024;
   const [formData, setFormData] = useState<FileFormData>({
     sender_name: "",
     subject: "",
@@ -48,6 +49,14 @@ const FileForm: React.FC<FileFormProps> = ({ onSubmit, isLoading }) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > MAX_FILE_SIZE) {
+        setErrors((prev) => ({
+          ...prev,
+          file: "O arquivo excede o tamanho máximo de 50 MB.",
+        }));
+        setSelectedFile(null);
+        return;
+      }
       setSelectedFile(file);
       if (errors.file) {
         setErrors((prev) => ({ ...prev, file: undefined }));

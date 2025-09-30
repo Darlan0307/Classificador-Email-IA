@@ -22,8 +22,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 RUN python -c "import nltk; \
     nltk.download('punkt', quiet=True); \
     nltk.download('stopwords', quiet=True); \
-    nltk.download('rslp', quiet=True); \
-    nltk.download('vader_lexicon', quiet=True)"
+    nltk.download('rslp', quiet=True);"
 
 COPY . .
 

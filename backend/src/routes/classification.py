@@ -50,8 +50,6 @@ async def classify_email_text(
             email_data, classification_result["category"]
         )
         
-        logger.info(f"Email classificado como: {classification_result['category']}")
-        
         return EmailClassificationResponse(
             category=classification_result["category"],
             confidence_score=classification_result["confidence"],
@@ -102,8 +100,6 @@ async def classify_email_file(
         suggested_response = await ai_classifier.generate_response(
             email_data, classification_result["category"]
         )
-        
-        logger.info(f"Arquivo {file.filename} classificado como: {classification_result['category']}")
         
         return EmailClassificationResponse(
             category=classification_result["category"],

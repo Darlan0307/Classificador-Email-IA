@@ -11,8 +11,7 @@ const steps = [
   {
     icon: Brain,
     title: "Processar IA",
-    description:
-      "Análise inteligente usando algoritmos avançados de machine learning",
+    description: "Análise avançada com inteligência artificial",
   },
   {
     icon: CheckCircle,

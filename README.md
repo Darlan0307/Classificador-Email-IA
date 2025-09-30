@@ -24,8 +24,8 @@ Sistema inteligente para classificação automática de emails corporativos do s
 ### 2. Instalação
 
 ```bash
-git clone <repository-url>
-cd <nome-do-projeto>
+git clone https://github.com/Darlan0307/Classificador-Email-IA.git
+cd Classificador-Email-IA
 
 # Configure as variáveis de ambiente
 cp backend/.env.example backend/.env
@@ -36,19 +36,19 @@ cp frontend/.env.example frontend/.env
 ### 3. Inicialização
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 ### 4. Testes
+
+O Frontend estará disponível em:
+
+- **Aplicação**: http://localhost:8080
 
 A API estará disponível em:
 
 - **Aplicação**: http://localhost:8000
 - **Documentação**: http://localhost:8000/docs
-
-O Frontend estará disponível em:
-
-- **Aplicação**: http://localhost:8080
 
 </details>
 
@@ -65,8 +65,8 @@ O Frontend estará disponível em:
 ### 2. Instalação
 
 ```bash
-git clone <repository-url>
-cd <nome-do-projeto>
+git clone https://github.com/Darlan0307/Classificador-Email-IA.git
+cd Classificador-Email-IA
 
 # Configure as variáveis de ambiente
 cp backend/.env.example backend/.env
@@ -83,10 +83,22 @@ Crie um terminal específico para o backend e execute os comandos abaixo:
 # Acessar diretório do backend
 cd backend
 
-# Crie um ambiente virtual
+# Crie e ative o ambiente virtual
+# No Linux / macOS
 python3 -m venv venv
-source venv/bin/activate  # Linux / macOS
-venv\Scripts\activate   # Windows
+
+source venv/bin/activate
+
+# No Windows
+python -m venv venv
+
+venv\Scripts\activate
+
+# caso o comando acima não funcione, use o seguinte:
+venv\Scripts\activate.bat
+#ou
+venv\Scripts\Activate.ps1
+
 
 # Instale as dependências
 pip install -r requirements.txt
@@ -120,14 +132,14 @@ npm run dev
 
 ### 6. Testes
 
+O Frontend estará disponível em:
+
+- **Aplicação**: http://localhost:8080
+
 A API estará disponível em:
 
 - **Aplicação**: http://localhost:8000
 - **Documentação**: http://localhost:8000/docs
-
-O Frontend estará disponível em:
-
-- **Aplicação**: http://localhost:8080
 
 </details>
 
